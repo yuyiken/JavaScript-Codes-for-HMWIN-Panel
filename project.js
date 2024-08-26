@@ -62,3 +62,41 @@ project.getRndInteger = function(min, max)
 {
    return Math.floor(Math.random() * (max - min + 1) ) + min;
 }
+
+//Con esta función podemos limitar acceso para que en vez de abrir ventana
+//o dialogo nos abre un dialogo para abrir
+
+project.fnCheckUserAccessWdw = function (iNumPermiso, sNomVentana, bIsDialog) {
+    // Ventana sin permisos
+    var ventanaSinPermisos = "NoPermisos.jmx";
+    
+    try {
+        var UserGroup = project.sysVar.getProperty("This Client Group-Name");
+        
+        // Define los permisos máximos por grupo
+        var permisosMaximos = {
+            "Master": 4,
+            "admin": 3,
+            "Mantenimiento": 2,
+            "Operario": 1,
+            "_": 0
+        };
+        
+        // Obtén el permiso máximo para el grupo actual
+        var permisoMaximo = permisosMaximos[UserGroup] || 0;
+
+        // Verifica si el usuario tiene el permiso suficiente
+        if (iNumPermiso <= permisoMaximo) {
+            if (bIsDialog) {
+                project.showDialog(sNomVentana);
+            } else {
+                project.loadPage(sNomVentana);
+            }
+        } else {
+            project.showDialog(ventanaSinPermisos);
+        }
+        
+    } catch (Err) {
+        alert(Err);
+    }
+}
